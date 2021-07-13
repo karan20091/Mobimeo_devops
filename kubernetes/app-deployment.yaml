@@ -1,0 +1,35 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: petclinic-deployment
+  labels:
+    app: petclinic
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: petclinic
+        type: web
+    spec:
+      containers:
+        - name: petclinic
+          image: imanurag30/petclinic-backend:latest
+          ports:
+            - containerPort: 9966
+              name: http
+          env:
+            - name: DB_HOST
+              value: postgres-service
+            - name: DB_USERNAME
+              value: postgres                               
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: dbpassword
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: posgres-secret
+                  key: dbname      

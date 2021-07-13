@@ -1,0 +1,39 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: postgres-db
+    type: database
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres-db
+        type: database
+    spec:
+      containers:
+        - name: postgres-db
+          image: postgres:9.6.0
+          ports:
+            - containerPort: 5432
+              name: db-port
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: dbname
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: dbpassword
+          volumeMounts:
+          - name: petlinic-persistent-storage
+            mountPath: /var/lib/mysql
+      volumes:
+      - name: petclinic-persistent-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
